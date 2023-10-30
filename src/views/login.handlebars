@@ -1,0 +1,22 @@
+<form method="POST" action="/api/sessions/" class="border p-3 form ">
+    <label for="email" class="form-label">Email</label>
+    <input type="email" name="email" id="email" class="form-control" placeholder="Ingrese su Email">
+
+    <label for="password" class="form-label pt-2 ">Contraseña</label>
+    <input type="password" name="password" id="password" class="form-control" placeholder="Ingrese su Contraseña">
+
+    <button type="submit" class="btn btn-warning mt-2 mx-5" style="width: 100px;">Login</button>
+
+</form>
+
+<div>
+    <a href="./sessions/restore">Cambiar Contraseña</a>
+</div>
+
+<div>
+    <p>No tienes cuenta ? <a href="./sessions/register">Registrarte</a></p>
+</div>
+
+<div>
+    <a href="/api/sessions/github" ><button class="btn btn-dark mt-3 mx-5">Entrar con GitHub</button></a>
+</div>

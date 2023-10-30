@@ -1,0 +1,78 @@
+<div class="container" style="margin-top: 14%;  padding: 15px; border-radius: 29px;     background: darkkhaki;">
+    <h2 class="mt-4">Tu Carrito:</h2>
+    <ul class="list-group mt-3">
+      {{#if products.length}}
+      {{#each products}}
+      <li class="list-group-item">
+        <div class="product-info">
+          <div class="row align-items-center">
+            <div class="col-md-1">
+              <button class="btn btn-danger"style="padding: 20px; border-radius: 50px;" 
+              onclick="eliminarProducto('{{this.info._doc._id}}', '{{this.quantity}}', '${cid}')">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+            <div class="col-md-2">
+              <img src="{{this.info._doc.image}}" alt="{{this.info._doc.name}}" class="img-fluid"
+                width="100" />
+            </div>
+            <div class="col-md-7">
+              <h3>{{this.info._doc.name}}</h3>
+              <p>Cantidad: {{this.quantity}}</p>
+            </div>
+            <div class="col-md-2 text-end">
+              <p>Total: ${{this.total}}</p>
+            </div>
+          </div>
+        </div>
+      </li>
+      {{/each}}
+
+      <div class="text-end mt-3">
+        <p class="h4">Total General: ${{total}}</p class="h4">
+      </div>
+    </ul>
+
+    {{else}}
+    <li class="list-group-item d-flex justify-content-center align-items-center">
+      <div class="text-center">
+        <p>No hay productos en el carrito</p>
+        <a href="/api/products/productsList">Vuelve a la página de productos</a>
+      </div>
+    </li>
+    {{/if}}
+</div>
+<div>
+    <a href="/api/products/productsList" ><button class="btn btn-success mt-3 mx-5">Ir a la Tienda</button></a>
+</div>
+
+<script>
+    function eliminarProducto(productId, quantity, cartId) {
+      const cid = '{{cartId}}';
+      //const endpoint = `${cid}/products/${productId}`;
+
+      fetch(`/api/carts/${cid}/products/${productId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({quantity}),
+
+      })
+        .then((res) => {
+          if (res.ok) {
+            
+            console.log("Producto eliminado con éxito");
+            location.reload();
+          } else {
+            console.error("Error al eliminar el producto");
+          }
+        })
+        .catch((error) => {
+          console.error("Error de red al eliminar el producto", error);
+        });
+
+
+    }
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
