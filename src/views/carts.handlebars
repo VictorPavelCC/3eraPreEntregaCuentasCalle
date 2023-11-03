@@ -32,6 +32,10 @@
         <p class="h4">Total General: ${{total}}</p class="h4">
       </div>
     </ul>
+    <div class="text-end mt-3">
+      <button class="btn btn-success" onclick="continuePurchase('{{cartId}}')">Continuar</button>
+    </div>
+
 
     {{else}}
     <li class="list-group-item d-flex justify-content-center align-items-center">
@@ -45,6 +49,7 @@
 <div>
     <a href="/api/products/productsList" ><button class="btn btn-success mt-3 mx-5">Ir a la Tienda</button></a>
 </div>
+
 
 <script>
     function eliminarProducto(productId, quantity, cartId) {
@@ -71,8 +76,12 @@
         .catch((error) => {
           console.error("Error de red al eliminar el producto", error);
         });
-
-
     }
+    
+    function continuePurchase(cartId) {
+      console.log(cartId)
+      window.location.href = `/api/carts/${cartId}/purchase`;
+    }  
+
 </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />

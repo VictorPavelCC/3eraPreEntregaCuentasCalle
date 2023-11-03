@@ -34,9 +34,9 @@ async function addToCart(cid, productId) {
 
     if (!product) res.status(404).json({ error: "No se encontro el producto" });
 
-    if (!product.stock > 0)
+    /* if (!product.stock > 0)
       res.status(404).json({ error: "No hay stock disponible del producto" });
-
+ */
     const cart = await cartModel.findById(cid);
     console.log(cart)
 
@@ -48,7 +48,7 @@ async function addToCart(cid, productId) {
 
     if (cartProduct) {
       cartProduct.quantity += 1;
-      product.stock -= 1;
+      //product.stock -= 1;
     } else {
       cart.products.push({ product: product._id });
     }
@@ -145,6 +145,11 @@ async function deleteCart(cid) {
   }
 }
 
+
+
+
+
+
 module.exports = {
   createCart,
   getAllCarts,
@@ -152,5 +157,5 @@ module.exports = {
   addToCart,
   updateCartProduct,
   removeCartProduct,
-  deleteCart
+  deleteCart,
 };

@@ -1,6 +1,9 @@
 const { cartModel } = require("../dao/models/cart.model");
 const { productModel } = require("../dao/models/product.model");
 const CartDao = require("../dao/cartDao")
+const productDao = require("../dao/productsDao");
+const ticketDao = require("../dao/ticketDao")
+
 
 
 exports.createCart = async (req, res) => {
@@ -109,3 +112,60 @@ exports.createCart = async (req, res) => {
         res.status(500).json({ error: "Error al eliminar vaciar del carrito" });
       }
   };
+
+  exports.purchaseCart = async (req, res) => {
+    try {
+      const { cid } = req.params;
+      const cart = await CartDao.getCart(cid)
+  
+      if (!cart) {
+        return res.status(404).json({ status: 'error', message: 'Cart not found' });
+      }
+ 
+      const productsToPurchase = []; // Almacenará los productos disponibles para la compra
+      const productsNotPurchased = []; // Almacenará los productos sin suficiente stock
+      let totalPrice = 0;
+      console.log(cart)
+
+      for (const cartItem of cart.products) {
+        // Verifica si el producto tiene suficiente stock
+        const product = await productModel.findById(cartItem.product);
+        if (product.stock >= cartItem.quantity) {
+          // El producto tiene suficiente stock, réstalo del stock del producto
+          product.stock -= cartItem.quantity;
+          await product.save();
+          productsToPurchase.push(cartItem);
+
+          totalPrice += product.price * cartItem.quantity;
+        } else {
+          // El producto no tiene suficiente stock, omítelo
+          productsNotPurchased.push(cartItem);
+        }
+      }
+      const amount = totalPrice
+  
+    
+      const ticketData = {
+        cart: cart._id,
+        purchase_datetime: new Date(),
+        amount,
+        purchaser: req.user.email,
+      };
+
+      const TicketSave = await ticketDao.createTicket(ticketData);
+  
+      // Actualiza el carrito solo con los productos disponibles
+      cart.products = productsNotPurchased;
+      await cart.save();
+      // Responde con la lista de productos no comprados y un mensaje de éxito
+      res.json({
+        status: 'success',
+        message: 'Purchase completed successfully',
+        productsNotPurchased,
+      });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Internal server error' });
+    }
+  }
+  
+ 
