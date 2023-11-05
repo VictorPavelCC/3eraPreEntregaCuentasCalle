@@ -54,7 +54,7 @@
 <script>
     function eliminarProducto(productId, quantity, cartId) {
       const cid = '{{cartId}}';
-      //const endpoint = `${cid}/products/${productId}`;
+      
 
       fetch(`/api/carts/${cid}/products/${productId}`, {
         method: "DELETE",
@@ -79,7 +79,7 @@
     }
     
     function continuePurchase(cartId) {
-      console.log(cartId)
+      
       window.location.href = `/api/carts/${cartId}/purchase`;
     }  
 

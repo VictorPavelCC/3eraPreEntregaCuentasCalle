@@ -3,6 +3,10 @@ const { productModel } = require("../dao/models/product.model");
 const CartDao = require("../dao/cartDao")
 const productDao = require("../dao/productsDao");
 const ticketDao = require("../dao/ticketDao")
+const nodemailer = require("nodemailer")
+
+
+
 
 
 
@@ -122,23 +126,22 @@ exports.createCart = async (req, res) => {
         return res.status(404).json({ status: 'error', message: 'Cart not found' });
       }
  
-      const productsToPurchase = []; // Almacenará los productos disponibles para la compra
-      const productsNotPurchased = []; // Almacenará los productos sin suficiente stock
+      const productsToPurchase = []; // Disponible
+      const productsNotPurchased = []; // No disponible
       let totalPrice = 0;
       console.log(cart)
 
       for (const cartItem of cart.products) {
-        // Verifica si el producto tiene suficiente stock
+        // Stock
         const product = await productModel.findById(cartItem.product);
         if (product.stock >= cartItem.quantity) {
-          // El producto tiene suficiente stock, réstalo del stock del producto
           product.stock -= cartItem.quantity;
           await product.save();
           productsToPurchase.push(cartItem);
 
           totalPrice += product.price * cartItem.quantity;
         } else {
-          // El producto no tiene suficiente stock, omítelo
+
           productsNotPurchased.push(cartItem);
         }
       }
@@ -154,14 +157,57 @@ exports.createCart = async (req, res) => {
 
       const TicketSave = await ticketDao.createTicket(ticketData);
   
-      // Actualiza el carrito solo con los productos disponibles
       cart.products = productsNotPurchased;
       await cart.save();
-      // Responde con la lista de productos no comprados y un mensaje de éxito
-      res.json({
-        status: 'success',
-        message: 'Purchase completed successfully',
-        productsNotPurchased,
+      console.log("llego")
+      //Mail
+
+      /* const transport = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+          user: 'pavelcuentas@gmail.com',
+          pass: 'tuContraseña',
+        },
+      });
+
+      const mailOptions = {
+        from: 'E-commerce',
+        to: 'pavelcuentas@gmail.com',
+        subject: 'Tu compra',
+        text: 'Hola',mail
+      };
+      console.log("llego0")
+      let mail =`
+      <div>
+      <h1>Hola!!</h1>
+      <img src="https://www.compudemano.com/wp-content/uploads/2019/01/gracias-por-tu-compra.jpg" style="width:250px"/>
+      <p>Gracias por usar nuestros servicios</p>
+      <a href="https://www.google.com/">Pagina Principal</a>
+      </div>
+      
+      `
+      console.log("llego1")
+      const sendEmail = await transport.sendMail({
+        from: 'Backend Purchase',
+        //req.user.email
+        to: 'pavelcuentas@gmail.com',
+        subject: 'Purcharse',
+        mail
+      })
+      if (!sendEmail) return res.send({ status: 'error', error: 'email not sent' })
+      console.log("llego2")
+      
+ */
+
+
+
+
+      res.render("ticket", {
+        status: "success",
+        ticket: ticketData,
+        notPurchasedProducts: productsNotPurchased,
+        purchasedProducts: productsToPurchase,
+        cartId: cid,
       });
     } catch (error) {
       res.status(500).json({ status: 'error', message: 'Internal server error' });
