@@ -7,9 +7,40 @@
        <li class="bg-success text-white p-2 mt-4" >Total de la compra: ${{ticket.amount}}</li>
       </ul>
     </div>
-
+    {{!-- <ul class="list-group mt-3">
+      {{#if purchasedProducts.length}}
+      {{#each purchasedProducts}}
+      <li class="list-group-item">
+        <div class="product-info">
+          <div class="row align-items-center">
+            <div class="col-md-2">
+              <img src="{{this.image}}" alt="{{this.name}}" class="img-fluid"
+                width="100" />
+            </div>
+            <div class="col-md-7">
+              <h3>{{this.name}}</h3>
+              <p>Cantidad: {{this.quantity}}</p>
+            </div>
+            <div class="col-md-2 text-end">
+              <p>Total: ${{this.total}}</p>
+            </div>
+          </div>
+        </div>
+      </li>
+      {{/each}}
+      </ul>
+      {{else}}
+      <li class="list-group-item d-flex justify-content-center align-items-center">
+      <div class="text-center">
+        <p>No se compraron algunos productos por falta de stock, intenta mas tarde cuando se renueve el stock</p>
+      </div>
+    </li>
+    {{/if}} --}}
 
  
-  <div>
-    <a href="/api/products/productsList"><button class="btn btn-success mt-3 mx-5">Ir a la Tienda</button></a>
+<div>
+    <a href="/api/products/productsList">
+      <button class="btn btn-success mt-3 mx-5">Ir a la Tienda</button>
+    </a>
 </div>
+

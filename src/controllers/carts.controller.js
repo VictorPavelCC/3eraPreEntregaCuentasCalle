@@ -129,7 +129,7 @@ exports.createCart = async (req, res) => {
       const productsToPurchase = []; // Disponible
       const productsNotPurchased = []; // No disponible
       let totalPrice = 0;
-      console.log(cart)
+
 
       for (const cartItem of cart.products) {
         // Stock
@@ -154,12 +154,11 @@ exports.createCart = async (req, res) => {
         amount,
         purchaser: req.user.email,
       };
-
+      
       const TicketSave = await ticketDao.createTicket(ticketData);
   
       cart.products = productsNotPurchased;
       await cart.save();
-      console.log("llego")
       //Mail
 
       /* const transport = nodemailer.createTransport({
@@ -199,9 +198,7 @@ exports.createCart = async (req, res) => {
       
  */
 
-
-
-
+      console.log("productos compra",productsToPurchase)
       res.render("ticket", {
         status: "success",
         ticket: ticketData,
