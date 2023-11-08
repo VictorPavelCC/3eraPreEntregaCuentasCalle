@@ -4,10 +4,8 @@ const CartDao = require("../dao/cartDao")
 const productDao = require("../dao/productsDao");
 const ticketDao = require("../dao/ticketDao")
 const nodemailer = require("nodemailer")
-
-
-
-
+const { CustomError } = require("../services/errors/CustomError")
+const { CartErrorParams } = require("../services/errors/cartErrorNotExist")
 
 
 exports.createCart = async (req, res) => {
@@ -36,11 +34,16 @@ exports.createCart = async (req, res) => {
       
       const cart = await CartDao.getCart(id);
 
-      if (!cart) {
-        return res.status(404).json({ error: "Carrito no encontrado" });
+      if (!id || id.trim() === "") {
+        CustomError.createError({
+          name: "Error id carrito",
+          cause: CartErrorParams(id),
+          message: "Error obteniendo el carrito",
+          errorCode: EError.INVALID_PARAMS,
+        });
       }
 
-      const resume = cart.products.map(async (p) => {
+    const resume = cart.products.map(async (p) => {
       const data = {};
       data.info = await productModel.findById(p.product);
       data.quantity = p.quantity;
@@ -159,6 +162,17 @@ exports.createCart = async (req, res) => {
   
       cart.products = productsNotPurchased;
       await cart.save();
+      const resume = cart.products.map(async (p) => {
+        const data = {};
+        data.info = await productModel.findById(p.product);
+        data.quantity = p.quantity;
+        data.total = data.info.price * p.quantity;
+        
+        return data;
+      });
+      const dataCompra = await Promise.all(resume);
+    
+
       //Mail
 
       /* const transport = nodemailer.createTransport({
