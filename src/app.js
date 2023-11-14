@@ -10,6 +10,8 @@ const productRouter = require("./routes/products.router")
 const mockingRouter = require("./routes/mocks.router")
 const errorHandler = require("./middleware/errors/errorHandler")
 const passport = require('passport')
+const adLogger = require ('./utils/logger')
+const dotenv = require('dotenv')
 const initializePassport = require('./config/passport.config')
 const config = require("./config/config")
 
@@ -56,3 +58,13 @@ app.use("/api/products", productRouter);
 app.use("/api/carts", cartRouter);  
 app.use("/api/mockingproducts", mockingRouter);
 app.use(errorHandler);
+
+app.use (adLogger)
+
+app.get('/loggerTest', (req, res) => {
+    req.logger.debug('debug')
+    req.logger.http('http')
+    req.logger.warning('warning')
+    req.logger.error('error')
+    res.send('Logger test')
+  })
