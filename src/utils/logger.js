@@ -1,8 +1,8 @@
 const winston = require('winston')
-const  env = require('../config/config')
+const { createLogger, format, transports } = winston;
 
-const customLevelOptions = {
-    levels: {
+const customLevelsOptions = {
+  levels: {
       fatal: 0,
       error: 1,
       warning: 2,
@@ -11,52 +11,51 @@ const customLevelOptions = {
       debug: 5,
     },
     colors: {
-      fatal: "red",
-      error: "orange",
-      warning: "yellow",
-      info: "blue",
-      http: "grey",
-      debug: "white",
-    },
-};
-
-
-const devLogger = winston.createLogger({
-    levels: customLevelOptions.levels,
-    transports: [
-      new winston.transports.Console({
-        level: "debug",
-      }),
-    ],
-});
-
-
-const prodLogger = winston.createLogger({
-    levels: customLevelOptions.levels,
-    transports: [
-      new winston.transports.Console({
-        level: "info",
-      }),
-      new winston.transports.File({
-        filename: "./logs/errors.log",
-        level: "error",
-        format: winston.format.simple(),
-      }),
-    ],
-  });
-  
-
-function addLogger(req, res, next) {
-    if (environmentMode == "dev") {
-      req.logger = devLogger;
-    } else if (environmentMode == "prod") {
-      req.logger = prodLogger;
+      fatal: 'red',
+      error: 'magenta',
+      warning: 'yellow',
+      info: 'blue',
+      http: 'gray',
+      debug: 'black',
     }
-  
-    req.logger.http(
-      `${req.method} en ${req.url} - ${new Date().toLocaleTimeString()}`
-    );
-    next();
-  }
+}
 
-  module.exports = addLogger
+
+const devLogger = createLogger({
+  levels: customLevelsOptions.levels,
+  level: 'debug',
+  format: format.combine(
+      format.colorize({colors: customLevelsOptions.colors}),
+      format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+      format.simple()
+  ),
+  transports: [
+      new transports.Console(),
+  ]
+})
+
+
+const prodLogger = createLogger({
+  levels: customLevelsOptions.levels,
+  level: "info",
+  format: format.combine(
+      format.colorize({colors: customLevelsOptions.colors}),
+      format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+      format.simple()
+  ),
+  transports: [
+      new transports.File({
+          filename: "./src/logs/errors.log",
+          level: "error", 
+          format: format.combine(
+              format.simple()
+          ),
+      })
+  ]
+})
+
+const logger = process.env.NODE_ENV === "PRODUCTION" ? prodLogger : devLogger;
+
+
+
+  module.exports = logger

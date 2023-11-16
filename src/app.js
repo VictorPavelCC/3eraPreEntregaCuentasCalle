@@ -10,8 +10,7 @@ const productRouter = require("./routes/products.router")
 const mockingRouter = require("./routes/mocks.router")
 const errorHandler = require("./middleware/errors/errorHandler")
 const passport = require('passport')
-const adLogger = require ('./utils/logger')
-const dotenv = require('dotenv')
+const logger = require ('./utils/logger')
 const initializePassport = require('./config/passport.config')
 const config = require("./config/config")
 
@@ -25,7 +24,7 @@ app.set("view engine", "handlebars")
 
 
 app.listen(PORT, () => {
-    console.log(`Servidor is running on port ${PORT}`)
+    logger.info(`Servidor is running on port ${PORT}`)
 })
 
 
@@ -33,6 +32,12 @@ mongoose.connect(config.mongoUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
+.then(() => {
+    logger.info("Connected to Mongo Atlas DB");
+  })
+.catch((error) => {
+    logger.error(error);
+  });
 
 app.use(session({
     store: MongoStore.create({
@@ -59,7 +64,7 @@ app.use("/api/carts", cartRouter);
 app.use("/api/mockingproducts", mockingRouter);
 app.use(errorHandler);
 
-app.use (adLogger)
+/* app.use (adLogger)
 
 app.get('/loggerTest', (req, res) => {
     req.logger.debug('debug')
@@ -67,4 +72,4 @@ app.get('/loggerTest', (req, res) => {
     req.logger.warning('warning')
     req.logger.error('error')
     res.send('Logger test')
-  })
+  }) */
