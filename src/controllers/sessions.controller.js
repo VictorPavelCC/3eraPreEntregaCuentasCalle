@@ -3,6 +3,7 @@ const {cartModel} =require('../dao/models/cart.model')
 const { createHash } = require('../../utils');
 const passport = require('passport');
 const sessionsDao = require("../dao/sessionsDao")
+const logger = require("../utils/logger")
 exports.renderRegister = (req, res) => {
     try {
         res.render("register.handlebars")
@@ -14,7 +15,7 @@ exports.renderRegister = (req, res) => {
 exports.register = async (req, res) => {
      try {
 
-        console.log("Usuario registrado correctamente.");
+        logger.info("Usuario registrado correctamente.");
         res.redirect("/api/sessions")
 
     } catch (error) {
@@ -58,6 +59,7 @@ exports.renderRestore = (req, res) => {
 exports.logout = (req, res) => {
     req.session.destroy(err => {
         if (!err) {
+            logger.info(`se ha cerrado la sesion actual`);
             res.redirect('/api/sessions')
         } else {
             res.send("Error al intentar salir.")
@@ -85,7 +87,7 @@ exports.login = async (req, res) => {
         _id: req.user._id
     };
 
-    console.log("Datos correctos, ingresando a vista de perfil.");
+    logger.info(`Usuario Identificado: Bienvenido ${req.session.user.first_name} ${req.session.user.last_name}`)
     res.redirect("/api/sessions/profile");
 };
 
@@ -121,6 +123,7 @@ exports.restorePassword = async (req, res) => {
 
         res.redirect("/api/sessions");
     } catch (error) {
+        logger.error(error)
         res.status(500).send("Error al cambiar contraseña.");
     }
 };
